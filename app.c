@@ -1,6 +1,4 @@
-#include "dm.h"
-
-#include <stdio.h>
+#include "DarkMatter/dm.h"
 
 typedef enum exit_code_t
 {

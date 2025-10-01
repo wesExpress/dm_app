@@ -1,5 +1,5 @@
 #define DM_IMPLEMENTATION
-#include "dm.h"
+#include "DarkMatter/dm.h"
 
 extern int run();
 
