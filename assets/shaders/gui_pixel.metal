@@ -29,6 +29,6 @@ struct resource_buffer
 
 fragment float4 fragment_main(const device texture_argument_buffer& t_buffer[[buffer(0)]], const device resource_buffer& resources[[buffer(1)]], fragment_in frag[[stage_in]])
 {
-    return t_buffer.textures[2].sample(t_buffer.samplers[1], frag.uv);
+    return t_buffer.textures[2].sample(t_buffer.samplers[1], frag.uv) * frag.color;
 }
 

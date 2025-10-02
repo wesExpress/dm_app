@@ -3,8 +3,8 @@ using namespace metal;
 
 struct vertex_in
 {
-    float2 position;
-    float2 uv;
+    packed_float2 position;
+    packed_float2 uv;
     float4 color;
 };
 
