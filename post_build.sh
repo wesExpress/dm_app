@@ -4,6 +4,7 @@ SRC_DIR=$PWD
 
 mkdir -p $SRC_DIR/build/assets/shaders/
 mkdir -p $SRC_DIR/build/assets/textures/
+mkdir -p $SRC_DIR/build/assets/fonts/
 
 cd assets/shaders
 
@@ -26,3 +27,10 @@ cd ../textures
 for file in *; do
     cp $file $SRC_DIR/build/assets/textures/
 done
+
+cd ../fonts
+
+for file in *; do
+    cp $file $SRC_DIR/build/assets/fonts/
+done
+

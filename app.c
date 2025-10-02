@@ -1,4 +1,5 @@
 #include "DarkMatter/dm.h"
+#include "gui.h"
 
 typedef enum exit_code_t
 {
@@ -44,17 +45,21 @@ typedef struct application_t
     instance instances[ENTITY_COUNT];
 
     dm_context* context;
+    gui_context* gui; 
 } application;
 
 bool app_init(application* app)
 {
     app->context = dm_init(0,0,1280,720, "test", DM_WINDOW_CREATE_FLAG_CENTER);
+    if(!app->context) return false;
     
-    return app->context!=NULL;
+
+    return true;
 }
 
 void app_shutdown(application* app)
 {
+    gui_shutdown(app->gui, app->context);
     dm_shutdown(app->context);
 }
 
@@ -145,9 +150,21 @@ bool create_resources(application* app)
 
     if(!dm_create_sampler(sampler_desc, &app->sampler, app->context)) return false;
 
-    // texture
+    // textures
     if(!dm_create_texture_from_file("assets/textures/container.jpg", &app->texture, app->context)) return false;
     if(!dm_create_texture_from_file("assets/textures/awesomeFace.png", &app->texture2, app->context)) return false;
+
+    // gui 
+    const char* font_paths[] = {
+        "assets/fonts/JetBrainsMonoNerdFont-Regular.ttf"
+    };
+
+    uint8_t sizes[] = {
+        16
+    };
+
+    app->gui = gui_init(font_paths, sizes, 1, app->context);
+    if(!app->gui) return false;
 
     //
     if(!dm_finish_init(app->context)) return false;
@@ -169,6 +186,7 @@ exit_code app_run(application* app)
         dm_timer_start(&frame_timer);
 
         if(!dm_update(app->context)) return EXIT_CODE_UPDATE_FAIL;
+        gui_update_input(app->gui, app->context);
 
         if(dm_input_is_key_pressed(DM_KEY_ESCAPE, app->context)) { dm_log(DM_LOG_WARN, "window closed"); return EXIT_CODE_WINDOW_CLOSE; }
         
@@ -198,6 +216,13 @@ exit_code app_run(application* app)
             app->instances[i].texture = i % 2;
         }
 
+        // gui test
+        nk_style_set_font(&app->gui->ctx, &app->gui->fonts[0]->handle);
+        if(nk_begin(&app->gui->ctx,"Test", nk_rect(100,100, 350,550), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_DYNAMIC | NK_WINDOW_SCALABLE))
+        {
+            nk_end(&app->gui->ctx);
+        }
+
         // rendering
         if(!dm_begin_frame(app->context)) { dm_log(DM_LOG_FATAL, "begin frame failed"); return EXIT_CODE_RENDER_FAIL; }
 
@@ -206,6 +231,8 @@ exit_code app_run(application* app)
         dm_render_command_begin_update(app->context);
             dm_render_command_update_constant_buffer(app->cb, &app->camera.vp, sizeof(mat4), 0, app->context);
             dm_render_command_update_storage_buffer(app->instance_buffer, app->instances, sizeof(app->instances), 0, app->context);
+
+            gui_update_buffers(app->gui, app->context);
         dm_render_command_end_update(app->context);
 
         dm_render_command_begin_render_pass(app->pass, 0.5f,0.7f,0.9f,1,1, app->context);
@@ -214,6 +241,8 @@ exit_code app_run(application* app)
             dm_render_command_bind_vertex_buffer(app->vb, 0, 0, app->context);
             dm_render_command_bind_index_buffer(app->ib, 0, app->context);
             dm_render_command_draw_instanced_indexed(ENTITY_COUNT,0,6,0,0, app->context);
+
+            gui_render(app->gui, app->context);
         dm_render_command_end_render_pass(app->pass, app->context);
 
         if(!dm_submit_render_commands(app->context)) { dm_log(DM_LOG_FATAL, "submit commands failed"); return EXIT_CODE_RENDER_FAIL; }

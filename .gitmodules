@@ -1,3 +1,6 @@
 [submodule "DarkMatter"]
 	path = DarkMatter
 	url = git@github.com:wesExpress/DarkMatter.git
+[submodule "lib/Nuklear"]
+	path = lib/Nuklear
+	url = git@github.com:Immediate-Mode-UI/Nuklear.git
