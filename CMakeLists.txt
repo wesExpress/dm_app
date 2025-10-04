@@ -9,9 +9,9 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 SET(SOURCES app.c gui.c)
 
 if(APPLE)
-    SET(SOURCES ${SOURCES} main.m)
+    SET(SOURCES ${SOURCES} main.m DarkMatter/dm_impl.m)
 else()
-    SET(SOURCES ${SOURCES} main.c)
+    SET(SOURCES ${SOURCES} main.c DarkMatter/dm_impl.c)
 endif()
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES})

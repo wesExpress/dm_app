@@ -87,21 +87,21 @@ gui_context* gui_init(const char** font_paths, uint8_t* font_sizes, uint8_t font
 
     dm_shader_desc vertex_shader_desc = {
 #ifdef DM_DIRECTX12
-        .path="assets/shaders/nuklear_gui_vertex.cso"
+        .path="assets/shaders/gui_vertex.cso"
 #elif defined(DM_METAL)
         .path="assets/shaders/gui_vertex.metallib"
 #elif defined(DM_VULKAN)
-        .path="assets/shaders/nuklear_gui_vertex.spv"
+        .path="assets/shaders/gui_vertex.spv"
 #endif
     };
 
     dm_shader_desc pixel_shader_desc = {
 #ifdef DM_DIRECTX12
-        .path="assets/shaders/nuklear_gui_pixel.cso"
+        .path="assets/shaders/gui_pixel.cso"
 #elif defined(DM_METAL)
         .path="assets/shaders/gui_pixel.metallib"
 #elif defined(DM_VULKAN)
-        .path="assets/shaders/nuklear_gui_pixel.spv"
+        .path="assets/shaders/gui_pixel.spv"
 #endif
     };
 

@@ -50,9 +50,13 @@ typedef struct application_t
 
 bool app_init(application* app)
 {
-    app->context = dm_init(0,0,1280,720, "test", DM_WINDOW_CREATE_FLAG_CENTER);
+#ifdef DM_PLATFORM_APPLE
+    uint32_t width = 1280, height = 720;
+#else
+    uint32_t width = 1920, height = 1080;
+#endif
+    app->context = dm_init(0,0,width,height, "test", DM_WINDOW_CREATE_FLAG_CENTER);
     if(!app->context) return false;
-    
 
     return true;
 }
@@ -68,14 +72,44 @@ bool create_resources(application* app)
     dm_renderpass_desc pass_desc = { .type=DM_RENDERPASS_TYPE_DEFAULT };
     if(!dm_create_renderpass(pass_desc, &app->pass, app->context)) return false;
 
+    dm_input_element_desc position_element = {
+        .name="POSITION",
+        .class=DM_INPUT_ELEMENT_CLASS_PER_VERTEX,
+        .format=DM_INPUT_ELEMENT_FORMAT_FLOAT_4,
+        .stride=sizeof(vertex),
+        .offset=offsetof(vertex, position),
+    };
+
+    dm_input_element_desc tex_coords_element = {
+        .name="TEX_COORDS",
+        .class=DM_INPUT_ELEMENT_CLASS_PER_VERTEX,
+        .format=DM_INPUT_ELEMENT_FORMAT_FLOAT_2,
+        .stride=sizeof(vertex),
+        .offset=offsetof(vertex, uv),
+    };
+
+    dm_input_element_desc color_element = {
+        .name="COLOR",
+        .class=DM_INPUT_ELEMENT_CLASS_PER_VERTEX,
+        .format=DM_INPUT_ELEMENT_FORMAT_FLOAT_4,
+        .stride=sizeof(vertex),
+        .offset=offsetof(vertex, color),
+    };
+
     dm_rasterizer_desc rasterizer = {
+#ifdef DM_DIRECTX12
+        .vertex_shader_desc.path="assets/shaders/vertex.cso",
+        .pixel_shader_desc.path="assets/shaders/pixel.cso",
+#elif defined(DM_METAL)
         .vertex_shader_desc.path="assets/shaders/vertex_shader.metallib",
         .pixel_shader_desc.path="assets/shaders/pixel_shader.metallib",
+#endif
         .cull_mode=DM_RASTERIZER_CULL_MODE_FRONT, .front_face=DM_RASTERIZER_FRONT_FACE_COUNTER_CLOCKWISE,
         .polygon_fill=DM_RASTERIZER_POLYGON_FILL_FILL
     };
 
     dm_raster_input_assembler_desc input_assembler = {
+        .input_elements={ position_element, color_element, tex_coords_element }, .input_element_count=3,
         .topology=DM_INPUT_TOPOLOGY_TRIANGLE_LIST
     };
 
