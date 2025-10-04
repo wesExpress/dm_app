@@ -6,12 +6,12 @@ PROJECT(app)
 ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-SET(SOURCES app.c gui.c)
+SET(SOURCES app.c gui.c DarkMatter/dm_impl.c DarkMatter/dm_window.c)
 
 if(APPLE)
-    SET(SOURCES ${SOURCES} main.m DarkMatter/dm_impl.m)
+    SET(SOURCES ${SOURCES} DarkMatter/dm_metal.m)
 else()
-    SET(SOURCES ${SOURCES} main.c DarkMatter/dm_impl.c)
+    SET(SOURCES ${SOURCES} DarkMatter/dm_dx12.c)
 endif()
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES})

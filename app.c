@@ -258,7 +258,7 @@ exit_code app_run(application* app)
         }
 
         // rendering
-        if(!dm_begin_frame(app->context)) { dm_log(DM_LOG_FATAL, "begin frame failed"); return EXIT_CODE_RENDER_FAIL; }
+        dm_render_command_begin_frame(app->context);
 
         dm_resource_handle resources[] = { app->cb,app->instance_buffer };
 
@@ -279,10 +279,10 @@ exit_code app_run(application* app)
             gui_render(app->gui, app->context);
         dm_render_command_end_render_pass(app->pass, app->context);
 
+        dm_render_command_end_frame(app->context);
+
         if(!dm_submit_render_commands(app->context)) { dm_log(DM_LOG_FATAL, "submit commands failed"); return EXIT_CODE_RENDER_FAIL; }
         
-        if(!dm_end_frame(app->context))   { dm_log(DM_LOG_FATAL, "end frame failed"); return EXIT_CODE_RENDER_FAIL; }
-
         // frame timing and fps
         if(dm_timer_elapsed(&timer) >= 1)
         {
@@ -303,7 +303,7 @@ exit_code app_run(application* app)
 /********
  * MAIN *
  ********/
-int run()
+int main()
 {
     application app = { 0 };
 
