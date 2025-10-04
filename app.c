@@ -254,6 +254,11 @@ exit_code app_run(application* app)
         nk_style_set_font(&app->gui->ctx, &app->gui->fonts[0]->handle);
         if(nk_begin(&app->gui->ctx,"Test", nk_rect(100,100, 350,550), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_DYNAMIC | NK_WINDOW_SCALABLE))
         {
+            nk_layout_row_dynamic(&app->gui->ctx, 20, 1);
+            char buffer[512];
+            sprintf(buffer, "Frame time: %lf ms", frame_time);
+            nk_label(&app->gui->ctx, buffer, NK_TEXT_LEFT);
+
             nk_end(&app->gui->ctx);
         }
 
@@ -286,15 +291,12 @@ exit_code app_run(application* app)
         // frame timing and fps
         if(dm_timer_elapsed(&timer) >= 1)
         {
-#ifdef DM_DEBUG
-            dm_log(DM_LOG_TRACE, "FPS: %d", frame_count);
-#endif
             dm_timer_start(&timer);
             frame_count = 0;
         }
         else frame_count++;
 
-        frame_time = dm_timer_elapsed(&frame_timer);
+        frame_time = dm_timer_elapsed_ms(&frame_timer);
     }
 
     return EXIT_CODE_SUCCESS;
