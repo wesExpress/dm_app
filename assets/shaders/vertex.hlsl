@@ -23,6 +23,7 @@ struct instance
     matrix model;
     uint   texture;
     uint   sampler;
+    uint   padding[2];
 };
 
 struct resource_indices

@@ -29,6 +29,9 @@ gui_context* gui_init(const char** font_paths, uint8_t* font_sizes, uint8_t font
 
     // === constant buffer ===
     glm_ortho(0,(float)dm_get_window_width(context), (float)dm_get_window_height(context),0, -1,1, gui->ortho);
+#ifdef DM_DIRECTX12
+    glm_mat4_transpose(gui->ortho);
+#endif
 
     dm_constant_buffer_desc cb_desc = {
         .size=sizeof(mat4),
@@ -171,7 +174,7 @@ gui_context* gui_init(const char** font_paths, uint8_t* font_sizes, uint8_t font
         gui->fonts[i] = nk_font_atlas_add_from_file(&gui->atlas, font_paths[i], font_sizes[i], 0);
 
         int w,h;
-        void* data = nk_font_atlas_bake(&gui->atlas, &w,&h, NK_FONT_ATLAS_RGBA32);
+        const void* data = nk_font_atlas_bake(&gui->atlas, &w,&h, NK_FONT_ATLAS_RGBA32);
 
         dm_texture_desc texture_desc = { 
             .width=w, .height=h,
@@ -268,13 +271,8 @@ void gui_update_buffers(gui_context* gui, dm_context* context)
 
 void gui_render(gui_context* gui, dm_context* context)
 {
-    dm_render_command_bind_raster_pipeline(gui->pipeline, context);
-    dm_render_command_bind_vertex_buffer(gui->vb, 0, 0, context);
-    dm_render_command_bind_index_buffer(gui->ib, 0, context);
-
     gui->handles[0] = gui->cb;
-
-    dm_render_command_submit_resources(gui->handles, 1, context);
+    gui->handles[1] = gui->font_texture;
 
     const struct nk_draw_command* cmd;
     uint32_t offset = 0;
@@ -282,6 +280,10 @@ void gui_render(gui_context* gui, dm_context* context)
     {
         if(!cmd->elem_count) continue;
 
+        dm_render_command_bind_raster_pipeline(gui->pipeline, context);
+        dm_render_command_submit_resources(gui->handles, 2, context);
+        dm_render_command_bind_vertex_buffer(gui->vb, 0, 0, context);
+        dm_render_command_bind_index_buffer(gui->ib, 0, context);
         dm_render_command_draw_instanced_indexed(1,0,cmd->elem_count,offset,0, context);
         offset += cmd->elem_count;
     }

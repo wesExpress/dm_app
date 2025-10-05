@@ -11,6 +11,7 @@ struct instance
     matrix model;
     uint   texture_index;
     uint   sampler_index;
+    uint   padding[2];
 };
 
 struct resource_indices
@@ -27,7 +28,7 @@ float4 main(fragment frag) : SV_Target
     
     instance inst = instance_buffer[frag.inst_id];
 
-    Texture2D    t = ResourceDescriptorHeap[inst.texture_index];
+    Texture2D    t = ResourceDescriptorHeap[inst.texture_index+1];
     SamplerState s = SamplerDescriptorHeap[inst.sampler_index];
 
     return t.Sample(s, frag.uv);

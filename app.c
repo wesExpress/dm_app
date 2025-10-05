@@ -23,6 +23,8 @@ typedef struct instance_t
 {
     mat4 model;
     uint32_t texture;
+    uint32_t sampler;
+    uint32_t padding[2];
 } instance;
 
 typedef struct simple_camera_t
@@ -269,8 +271,8 @@ exit_code app_run(application* app)
 #ifdef DM_DIRECTX12
             glm_mat4_transpose(app->instances[i].model);
 #endif
-
-            app->instances[i].texture = i % 2;
+            if(i % 2) app->instances[i].texture = dm_get_resource_index(app->texture2, app->context);
+            else      app->instances[i].texture = dm_get_resource_index(app->texture, app->context);
         }
 
         // gui test
@@ -285,10 +287,10 @@ exit_code app_run(application* app)
             nk_end(&app->gui->ctx);
         }
 
+        dm_resource_handle resources[] = { app->cb,app->instance_buffer };
+
         // rendering
         dm_render_command_begin_frame(app->context);
-
-        dm_resource_handle resources[] = { app->cb,app->instance_buffer };
 
         dm_render_command_begin_update(app->context);
             dm_render_command_update_constant_buffer(app->cb, &app->camera.vp, sizeof(mat4), 0, app->context);
