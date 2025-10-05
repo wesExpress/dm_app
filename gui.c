@@ -110,14 +110,6 @@ gui_context* gui_init(const char** font_paths, uint8_t* font_sizes, uint8_t font
         .vertex_shader_desc=vertex_shader_desc, .pixel_shader_desc=pixel_shader_desc
     };
 
-    dm_viewport viewport = {
-        .type=DM_VIEWPORT_TYPE_DEFAULT
-    };
-
-    dm_scissor scissor = {
-        .type=DM_SCISSOR_TYPE_DEFAULT
-    };
-
     dm_depth_stencil_desc depth_stencil = {
         .depth=false,
         .stencil=false
@@ -125,7 +117,6 @@ gui_context* gui_init(const char** font_paths, uint8_t* font_sizes, uint8_t font
 
     dm_raster_pipeline_desc pipeline_desc = {
         pipeline_desc.input_assembler=input_assembler,.rasterizer=rasterizer_desc,
-        .viewport=viewport, .scissor=scissor, .depth_stencil=depth_stencil
     };
 
     if(!dm_create_raster_pipeline(pipeline_desc, &gui->pipeline, context)) { dm_free((void*)gui); return NULL; }
@@ -180,7 +171,7 @@ gui_context* gui_init(const char** font_paths, uint8_t* font_sizes, uint8_t font
         gui->fonts[i] = nk_font_atlas_add_from_file(&gui->atlas, font_paths[i], font_sizes[i], 0);
 
         int w,h;
-        const void* data = nk_font_atlas_bake(&gui->atlas, &w,&h, NK_FONT_ATLAS_RGBA32);
+        void* data = nk_font_atlas_bake(&gui->atlas, &w,&h, NK_FONT_ATLAS_RGBA32);
 
         dm_texture_desc texture_desc = { 
             .width=w, .height=h,

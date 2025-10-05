@@ -36,6 +36,8 @@ typedef struct application_t
 {
     dm_renderpass_handle pass;
     dm_pipeline_handle pipeline;
+    dm_viewport_index viewport;
+    dm_scissor_index scissor;
     dm_resource_handle vb, ib, cb;
     dm_resource_handle instance_buffer;
     dm_resource_handle texture, texture2;
@@ -115,10 +117,25 @@ bool create_resources(application* app)
 
     dm_raster_pipeline_desc pipe_desc = {
         .rasterizer=rasterizer, .input_assembler=input_assembler,
-        .viewport={ .type=DM_VIEWPORT_TYPE_DEFAULT }, .scissor={ .type=DM_SCISSOR_TYPE_DEFAULT }
     };
 
     if(!dm_create_raster_pipeline(pipe_desc, &app->pipeline, app->context)) return false;
+
+    dm_viewport viewport = {
+        .right=dm_get_window_width(app->context),
+        .bottom=dm_get_window_height(app->context),
+        .left=0,.top=0
+    };
+
+    dm_create_viewport(viewport, &app->viewport, app->context);
+
+    dm_scissor scissor = {
+        .right=dm_get_window_width(app->context),
+        .bottom=dm_get_window_height(app->context),
+        .left=0, .top=0
+    };
+
+    dm_create_scissor(scissor, &app->scissor, app->context);
 
     vertex vertices[] = {
         { { -0.5f,-0.5f,0.f }, {1,0,0,1}, { 0,0 } },
@@ -240,12 +257,18 @@ exit_code app_run(application* app)
 
         glm_lookat(app->camera.position, target, up, app->camera.view);
         glm_mul(app->camera.perspective, app->camera.view, app->camera.vp);
+#ifdef DM_DIRECTX12
+        glm_mat4_transpose(app->camera.vp);
+#endif
 
         for(uint8_t i=0; i<ENTITY_COUNT; i++)
         {
             float x = (float)i / (float)ENTITY_COUNT * 10.f - 5.f;
             glm_mat4_identity(app->instances[i].model);
             glm_translate(app->instances[i].model, (vec3){ x,x,x });
+#ifdef DM_DIRECTX12
+            glm_mat4_transpose(app->instances[i].model);
+#endif
 
             app->instances[i].texture = i % 2;
         }
@@ -275,6 +298,9 @@ exit_code app_run(application* app)
         dm_render_command_end_update(app->context);
 
         dm_render_command_begin_render_pass(app->pass, 0.5f,0.7f,0.9f,1,1, app->context);
+            dm_render_command_set_viewport(app->viewport, app->context);
+            dm_render_command_set_scissor(app->scissor, app->context);
+
             dm_render_command_bind_raster_pipeline(app->pipeline, app->context);
             dm_render_command_submit_resources(resources, DM_COUNTOF(resources), app->context);
             dm_render_command_bind_vertex_buffer(app->vb, 0, 0, app->context);
