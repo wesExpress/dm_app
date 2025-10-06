@@ -109,7 +109,7 @@ gui_context* gui_init(const char** font_paths, uint8_t* font_sizes, uint8_t font
     };
 
     dm_rasterizer_desc rasterizer_desc = {
-        .cull_mode=DM_RASTERIZER_CULL_MODE_NONE, .front_face=DM_RASTERIZER_FRONT_FACE_COUNTER_CLOCKWISE, .polygon_fill=DM_RASTERIZER_POLYGON_FILL_FILL,
+        .cull_mode=DM_RASTERIZER_CULL_MODE_BACK, .front_face=DM_RASTERIZER_FRONT_FACE_COUNTER_CLOCKWISE, .polygon_fill=DM_RASTERIZER_POLYGON_FILL_FILL,
         .vertex_shader_desc=vertex_shader_desc, .pixel_shader_desc=pixel_shader_desc
     };
 
@@ -273,6 +273,12 @@ void gui_render(gui_context* gui, dm_context* context)
 {
     gui->handles[0] = gui->cb;
     gui->handles[1] = gui->font_texture;
+    gui->handles[2] = gui->sampler;
+
+    dm_render_command_bind_raster_pipeline(gui->pipeline, context);
+    dm_render_command_submit_resources(gui->handles, 3, context);
+    dm_render_command_bind_vertex_buffer(gui->vb, 0, 0, context);
+    dm_render_command_bind_index_buffer(gui->ib, 0, context);
 
     const struct nk_draw_command* cmd;
     uint32_t offset = 0;
@@ -280,11 +286,8 @@ void gui_render(gui_context* gui, dm_context* context)
     {
         if(!cmd->elem_count) continue;
 
-        dm_render_command_bind_raster_pipeline(gui->pipeline, context);
-        dm_render_command_submit_resources(gui->handles, 2, context);
-        dm_render_command_bind_vertex_buffer(gui->vb, 0, 0, context);
-        dm_render_command_bind_index_buffer(gui->ib, 0, context);
         dm_render_command_draw_instanced_indexed(1,0,cmd->elem_count,offset,0, context);
+
         offset += cmd->elem_count;
     }
     

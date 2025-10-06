@@ -23,12 +23,12 @@ struct texture_argument_buffer
 struct resource_buffer 
 {
     device camera_data* camera[[id(0)]];
-    uint32_t font_texture;
-    uint32_t sampler;
+    texture2d<float> font_texture[[id(1)]];
+    sampler s[[id(2)]];
 };
 
 fragment float4 fragment_main(const device texture_argument_buffer& t_buffer[[buffer(0)]], const device resource_buffer& resources[[buffer(1)]], fragment_in frag[[stage_in]])
 {
-    return t_buffer.textures[2].sample(t_buffer.samplers[1], frag.uv) * frag.color;
+    return resources.font_texture.sample(resources.s, frag.uv) * frag.color;
 }
 

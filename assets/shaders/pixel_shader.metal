@@ -6,7 +6,7 @@ struct fragment_in
     float4 position[[position]];
     float4 color;
     float2 uv;
-    uint32_t texture;
+    uint32_t inst_id;
 };
 
 struct camera_data
@@ -17,7 +17,7 @@ struct camera_data
 struct instance 
 {
     float4x4 model;
-    uint32_t texture;
+    uint32_t indices[4];
 };
 
 struct texture_argument_buffer
@@ -34,8 +34,11 @@ struct resource_buffer
 
 fragment float4 fragment_main(const device texture_argument_buffer& t_buffer[[buffer(0)]], const device resource_buffer& resources[[buffer(1)]], fragment_in frag[[stage_in]])
 {
-    //return frag.color;
-    //return resources.material.sample(resources.s, frag.uv);
-    return t_buffer.textures[frag.texture].sample(t_buffer.samplers[0], frag.uv);
+    instance inst = resources.instances[frag.inst_id];
+
+    texture2d<float> t = t_buffer.textures[inst.indices[0]];
+    sampler s = t_buffer.samplers[inst.indices[1]];
+
+    return t.sample(s, frag.uv);
 }
 

@@ -22,9 +22,7 @@ typedef struct vertex_t
 typedef struct instance_t
 {
     mat4 model;
-    uint32_t texture;
-    uint32_t sampler;
-    uint32_t padding[2];
+    uint32_t indices[4];
 } instance;
 
 typedef struct simple_camera_t
@@ -108,7 +106,7 @@ bool create_resources(application* app)
         .vertex_shader_desc.path="assets/shaders/vertex_shader.metallib",
         .pixel_shader_desc.path="assets/shaders/pixel_shader.metallib",
 #endif
-        .cull_mode=DM_RASTERIZER_CULL_MODE_FRONT, .front_face=DM_RASTERIZER_FRONT_FACE_COUNTER_CLOCKWISE,
+        .cull_mode=DM_RASTERIZER_CULL_MODE_BACK, .front_face=DM_RASTERIZER_FRONT_FACE_COUNTER_CLOCKWISE,
         .polygon_fill=DM_RASTERIZER_POLYGON_FILL_FILL
     };
 
@@ -151,8 +149,6 @@ bool create_resources(application* app)
         2,3,0
     };
 
-    dm_resource_handle vb, ib;
-
     dm_vertex_buffer_desc vb_desc = {
         .size=sizeof(vertices), .stride=sizeof(vertex),
         .data=vertices
@@ -183,6 +179,9 @@ bool create_resources(application* app)
     glm_lookat(app->camera.position, target, up, app->camera.view);
     glm_perspective(fov, aspect, 0.1f, 100.f, app->camera.perspective);
     glm_mat4_mul(app->camera.perspective, app->camera.view, app->camera.vp);
+#ifdef DM_DIRECTX12
+    glm_mat4_transpose(app->camera.vp);
+#endif
 
     if(!dm_create_constant_buffer(cb_desc, &app->cb, app->context)) return false;
 
@@ -271,8 +270,11 @@ exit_code app_run(application* app)
 #ifdef DM_DIRECTX12
             glm_mat4_transpose(app->instances[i].model);
 #endif
-            if(i % 2) app->instances[i].texture = dm_get_resource_index(app->texture2, app->context);
-            else      app->instances[i].texture = dm_get_resource_index(app->texture, app->context);
+
+            if(i % 2) app->instances[i].indices[0] = dm_get_resource_index(app->texture2, app->context);
+            else      app->instances[i].indices[0] = dm_get_resource_index(app->texture, app->context);
+
+            app->instances[i].indices[1] = dm_get_resource_index(app->sampler, app->context);
         }
 
         // gui test
