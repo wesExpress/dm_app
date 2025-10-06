@@ -106,7 +106,7 @@ bool create_resources(application* app)
         .vertex_shader_desc.path="assets/shaders/vertex_shader.metallib",
         .pixel_shader_desc.path="assets/shaders/pixel_shader.metallib",
 #endif
-        .cull_mode=DM_RASTERIZER_CULL_MODE_BACK, .front_face=DM_RASTERIZER_FRONT_FACE_COUNTER_CLOCKWISE,
+        .cull_mode=DM_RASTERIZER_CULL_MODE_NONE, .front_face=DM_RASTERIZER_FRONT_FACE_COUNTER_CLOCKWISE,
         .polygon_fill=DM_RASTERIZER_POLYGON_FILL_FILL
     };
 

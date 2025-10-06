@@ -21,9 +21,7 @@ struct camera_data
 struct instance
 {
     matrix model;
-    uint   texture;
-    uint   sampler;
-    uint   padding[2];
+    uint   indices[4];
 };
 
 struct resource_indices
@@ -39,7 +37,7 @@ fragment main(vertex v, uint inst_id : SV_InstanceID)
     fragment frag;
 
     ConstantBuffer<camera_data> camera_buffer  = ResourceDescriptorHeap[resources.camera_buffer_index]; 
-    StructuredBuffer<instance> instance_buffer = ResourceDescriptorHeap[resources.instance_buffer_index];
+    StructuredBuffer<instance> instance_buffer = ResourceDescriptorHeap[resources.instance_buffer_index+1];
     
     matrix model = instance_buffer[inst_id].model;
 
