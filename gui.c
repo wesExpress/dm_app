@@ -109,7 +109,7 @@ gui_context* gui_init(const char** font_paths, uint8_t* font_sizes, uint8_t font
     };
 
     dm_rasterizer_desc rasterizer_desc = {
-        .cull_mode=DM_RASTERIZER_CULL_MODE_BACK, .front_face=DM_RASTERIZER_FRONT_FACE_COUNTER_CLOCKWISE, .polygon_fill=DM_RASTERIZER_POLYGON_FILL_FILL,
+        .cull_mode=DM_RASTERIZER_CULL_MODE_NONE, .front_face=DM_RASTERIZER_FRONT_FACE_COUNTER_CLOCKWISE, .polygon_fill=DM_RASTERIZER_POLYGON_FILL_FILL,
         .vertex_shader_desc=vertex_shader_desc, .pixel_shader_desc=pixel_shader_desc
     };
 

@@ -9,9 +9,7 @@ struct fragment
 struct instance 
 {
     matrix model;
-    uint   texture_index;
-    uint   sampler_index;
-    uint   padding[2];
+    uint   indices[4];
 };
 
 struct resource_indices
@@ -24,12 +22,12 @@ ConstantBuffer<resource_indices> resources : register(b0);
 
 float4 main(fragment frag) : SV_Target
 {
-    StructuredBuffer<instance> instance_buffer = ResourceDescriptorHeap[resources.instance_buffer_index];
+    StructuredBuffer<instance> instance_buffer = ResourceDescriptorHeap[resources.instance_buffer_index+1];
     
     instance inst = instance_buffer[frag.inst_id];
 
-    Texture2D    t = ResourceDescriptorHeap[inst.texture_index+1];
-    SamplerState s = SamplerDescriptorHeap[inst.sampler_index];
+    Texture2D    t = ResourceDescriptorHeap[inst.indices[0]+1];
+    SamplerState s = SamplerDescriptorHeap[inst.indices[1]];
 
     return t.Sample(s, frag.uv);
 }
