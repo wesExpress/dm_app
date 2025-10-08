@@ -50,6 +50,18 @@ typedef struct application_t
     gui_context* gui; 
 } application;
 
+vertex vertices[] = {
+    { { -0.5f,-0.5f,0.f }, {1,0,0,1}, { 0,0 } },
+    { {  0.5f,-0.5f,0.f }, {0,1,0,1}, { 1,0 } },
+    { {  0.5f, 0.5f,0.f }, {0,0,1,1}, { 1,1 } },
+    { { -0.5f, 0.5f,0.f }, {1,0,1,1}, { 0,1 } },
+};
+
+uint32_t indices[] = {
+    0,1,2,
+    2,3,0
+};
+
 bool app_init(application* app)
 {
 #ifdef DM_PLATFORM_APPLE
@@ -137,17 +149,6 @@ bool create_resources(application* app)
 
     dm_create_scissor(scissor, &app->scissor, app->context);
 
-    vertex vertices[] = {
-        { { -0.5f,-0.5f,0.f }, {1,0,0,1}, { 0,0 } },
-        { {  0.5f,-0.5f,0.f }, {0,1,0,1}, { 1,0 } },
-        { {  0.5f, 0.5f,0.f }, {0,0,1,1}, { 1,1 } },
-        { { -0.5f, 0.5f,0.f }, {1,0,1,1}, { 0,1 } },
-    };
-
-    uint32_t indices[] = {
-        0,1,2,
-        2,3,0
-    };
 
     dm_vertex_buffer_desc vb_desc = {
         .size=sizeof(vertices), .stride=sizeof(vertex),
