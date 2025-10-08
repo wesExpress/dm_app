@@ -31,10 +31,13 @@ vertex fragment_out vertex_main(const device resource_buffer& resources[[buffer(
 {
     fragment_out frag;
 
-    frag.position = float4(vertices[v_id].position.xy, 0, 1.f);
+    vertex_in v = vertices[v_id];
+
+    frag.position = float4(v.position.xy, 0, 1.f);
     frag.position = resources.camera->projection * frag.position;
-    frag.color    = vertices[v_id].color;
-    frag.uv       = vertices[v_id].uv;
+
+    frag.color    = v.color;
+    frag.uv       = v.uv;
 
     return frag;
 }

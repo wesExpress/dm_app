@@ -37,16 +37,18 @@ vertex fragment_out vertex_main(const device resource_buffer& resources[[buffer(
 {
     fragment_out frag;
 
+    vertex_in v = vertices[v_id];
     instance inst = resources.instances[inst_id];
 
     float4x4 model      = inst.model;
     float4x4 projection = resources.camera->projection;
 
-    frag.position = float4(vertices[v_id].position.xyz, 1.f);
+    frag.position = float4(v.position.xyz, 1.f);
     frag.position = model * frag.position;
     frag.position = projection * frag.position;
-    frag.color    = vertices[v_id].color;
-    frag.uv       = vertices[v_id].uv.xy;
+
+    frag.color    = v.color;
+    frag.uv       = v.uv.xy;
     frag.inst_id  = inst_id;
 
     return frag;
