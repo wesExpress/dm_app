@@ -129,6 +129,7 @@ bool create_resources(application* app)
 
     dm_raster_pipeline_desc pipe_desc = {
         .rasterizer=rasterizer, .input_assembler=input_assembler,
+        .depth_stencil={ .depth=true }
     };
 
     if(!dm_create_raster_pipeline(pipe_desc, &app->pipeline, app->context)) return false;
@@ -159,11 +160,6 @@ bool create_resources(application* app)
         .data=indices
     };
 
-    dm_constant_buffer_desc cb_desc = {
-        .size=sizeof(mat4),
-        .data=app->camera.vp
-    };
-
     if(!dm_create_vertex_buffer(vb_desc, &app->vb, app->context)) return false;
     if(!dm_create_index_buffer(ib_desc, &app->ib, app->context)) return false;
 
@@ -182,6 +178,11 @@ bool create_resources(application* app)
 #ifdef DM_DIRECTX12
     glm_mat4_transpose(app->camera.vp);
 #endif
+
+    dm_constant_buffer_desc cb_desc = {
+        .size=sizeof(mat4),
+        .data=app->camera.vp
+    };
 
     if(!dm_create_constant_buffer(cb_desc, &app->cb, app->context)) return false;
 
@@ -295,7 +296,7 @@ exit_code app_run(application* app)
         dm_render_command_begin_frame(app->context);
 
         dm_render_command_begin_update(app->context);
-            dm_render_command_update_constant_buffer(app->cb, &app->camera.vp, sizeof(mat4), 0, app->context);
+            dm_render_command_update_constant_buffer(app->cb, app->camera.vp, sizeof(mat4), 0, app->context);
             dm_render_command_update_storage_buffer(app->instance_buffer, app->instances, sizeof(app->instances), 0, app->context);
 
             gui_update_buffers(app->gui, app->context);
