@@ -72,6 +72,8 @@ bool app_init(application* app)
     app->context = dm_init(0,0,width,height, "test", DM_WINDOW_CREATE_FLAG_CENTER);
     if(!app->context) return false;
 
+    app->context->flags |= DM_CONTEXT_FLAG_VSYNC_ON;
+
     return true;
 }
 
@@ -283,9 +285,9 @@ exit_code app_run(application* app)
         // gui test
 #if 1
         nk_style_set_font(&app->gui->ctx, &app->gui->fonts[0]->handle);
-        if(nk_begin(&app->gui->ctx,"Test", nk_rect(100,100, 350,550), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_DYNAMIC | NK_WINDOW_SCALABLE))
+        if(nk_begin(&app->gui->ctx,"Test", nk_rect(100,100, 250,550), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_DYNAMIC | NK_WINDOW_SCALABLE))
         {
-            nk_layout_row_dynamic(&app->gui->ctx, 20, 1);
+            nk_layout_row_dynamic(&app->gui->ctx, 100, 1);
             char buffer[512];
             sprintf(buffer, "Frame time: %lf ms", frame_time);
             nk_label(&app->gui->ctx, buffer, NK_TEXT_LEFT);
