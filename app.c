@@ -36,8 +36,6 @@ typedef struct application_t
 {
     dm_renderpass_handle pass;
     dm_pipeline_handle pipeline;
-    dm_viewport_index viewport;
-    dm_scissor_index scissor;
     dm_resource_handle vb, ib, cb;
     dm_resource_handle instance_buffer;
     dm_resource_handle texture, texture2;
@@ -135,22 +133,6 @@ bool create_resources(application* app)
     };
 
     if(!dm_create_raster_pipeline(pipe_desc, &app->pipeline, app->context)) return false;
-
-    dm_viewport viewport = {
-        .right=dm_get_window_width(app->context),
-        .bottom=dm_get_window_height(app->context),
-        .left=0,.top=0
-    };
-
-    dm_create_viewport(viewport, &app->viewport, app->context);
-
-    dm_scissor scissor = {
-        .right=dm_get_window_width(app->context),
-        .bottom=dm_get_window_height(app->context),
-        .left=0, .top=0
-    };
-
-    dm_create_scissor(scissor, &app->scissor, app->context);
 
     dm_vertex_buffer_desc vb_desc = {
         .size=sizeof(vertices), .stride=sizeof(vertex),
@@ -302,6 +284,9 @@ exit_code app_run(application* app)
         dm_resource_handle resources[] = { app->cb,app->instance_buffer };
 
         // rendering
+        uint16_t x=0, y=0;
+        uint16_t w = dm_get_window_width(app->context);
+        uint16_t h = dm_get_window_height(app->context);
         dm_render_command_begin_frame(app->context);
 
             dm_render_command_begin_update(app->context);
@@ -312,8 +297,8 @@ exit_code app_run(application* app)
             dm_render_command_end_update(app->context);
 
             dm_render_command_begin_render_pass(app->pass, 0.5f,0.7f,0.9f,1,1, app->context);
-                dm_render_command_set_viewport(app->viewport, app->context);
-                dm_render_command_set_scissor(app->scissor, app->context);
+                dm_render_command_set_viewport(x,y,w,h,0.f,1.f, app->context);
+                dm_render_command_set_scissor(x,y,w,h, app->context);
 
                 dm_render_command_bind_raster_pipeline(app->pipeline, app->context);
                 dm_render_command_submit_resources(resources, DM_COUNTOF(resources), app->context);
