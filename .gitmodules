@@ -4,3 +4,6 @@
 [submodule "lib/Nuklear"]
 	path = lib/Nuklear
 	url = git@github.com:Immediate-Mode-UI/Nuklear.git
+[submodule "lib/cimgui"]
+	path = lib/cimgui
+	url = git@github.com:cimgui/cimgui.git

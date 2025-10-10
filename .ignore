@@ -1,1 +1,4 @@
-#DarkMatter/lib/*
+DarkMatter/lib/*
+lib/*
+assets/textures/*
+assets/fonts/*

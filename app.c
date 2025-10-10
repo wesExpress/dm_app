@@ -279,6 +279,7 @@ exit_code app_run(application* app)
         }
 
         // gui test
+#if 1
         nk_style_set_font(&app->gui->ctx, &app->gui->fonts[0]->handle);
         if(nk_begin(&app->gui->ctx,"Test", nk_rect(100,100, 350,550), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_DYNAMIC | NK_WINDOW_SCALABLE))
         {
@@ -289,6 +290,9 @@ exit_code app_run(application* app)
 
             nk_end(&app->gui->ctx);
         }
+#else
+        dm_log(DM_LOG_WARN, "%lf", frame_time);
+#endif
 
         dm_resource_handle resources[] = { app->cb,app->instance_buffer };
 
