@@ -245,11 +245,13 @@ exit_code app_run(application* app)
         
         glm_perspective(DM_DEG_TO_RAD(85.f), (float)dm_get_window_width(app->context) / (float)dm_get_window_height(app->context), 0.1f, 100.f, app->camera.perspective);
 
-        if(dm_input_is_key_pressed(DM_KEY_LEFT, app->context))       app->camera.position[0] += 0.001f;
-        else if(dm_input_is_key_pressed(DM_KEY_RIGHT, app->context)) app->camera.position[0] -= 0.001f;
+        float move = 5.f * frame_time * 0.001f;
 
-        if(dm_input_is_key_pressed(DM_KEY_UP, app->context))        app->camera.position[2] += 0.001f;
-        else if(dm_input_is_key_pressed(DM_KEY_DOWN, app->context)) app->camera.position[2] -= 0.001f;
+        if(dm_input_is_key_pressed(DM_KEY_LEFT, app->context))       app->camera.position[0] += move; 
+        else if(dm_input_is_key_pressed(DM_KEY_RIGHT, app->context)) app->camera.position[0] -= move;
+
+        if(dm_input_is_key_pressed(DM_KEY_UP, app->context))        app->camera.position[2] += move;
+        else if(dm_input_is_key_pressed(DM_KEY_DOWN, app->context)) app->camera.position[2] -= move;
 
         vec3 forward = { 0,0,1 };
         vec3 up = { 0,1,0 };
