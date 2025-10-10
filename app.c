@@ -72,6 +72,8 @@ bool app_init(application* app)
     app->context = dm_init(0,0,width,height, "test", DM_WINDOW_CREATE_FLAG_CENTER);
     if(!app->context) return false;
 
+    app->context->flags |= DM_CONTEXT_FLAG_VSYNC_ON;
+
     return true;
 }
 
@@ -244,11 +246,13 @@ exit_code app_run(application* app)
         
         glm_perspective(DM_DEG_TO_RAD(85.f), (float)dm_get_window_width(app->context) / (float)dm_get_window_height(app->context), 0.1f, 100.f, app->camera.perspective);
 
-        if(dm_input_is_key_pressed(DM_KEY_LEFT, app->context))       app->camera.position[0] += 0.001f;
-        else if(dm_input_is_key_pressed(DM_KEY_RIGHT, app->context)) app->camera.position[0] -= 0.001f;
+        float move = 5.f * frame_time * 0.001f;
 
-        if(dm_input_is_key_pressed(DM_KEY_UP, app->context))        app->camera.position[2] += 0.001f;
-        else if(dm_input_is_key_pressed(DM_KEY_DOWN, app->context)) app->camera.position[2] -= 0.001f;
+        if(dm_input_is_key_pressed(DM_KEY_LEFT, app->context))       app->camera.position[0] += move; 
+        else if(dm_input_is_key_pressed(DM_KEY_RIGHT, app->context)) app->camera.position[0] -= move;
+
+        if(dm_input_is_key_pressed(DM_KEY_UP, app->context))        app->camera.position[2] += move;
+        else if(dm_input_is_key_pressed(DM_KEY_DOWN, app->context)) app->camera.position[2] -= move;
 
         vec3 forward = { 0,0,1 };
         vec3 up = { 0,1,0 };
@@ -279,18 +283,21 @@ exit_code app_run(application* app)
 
         // gui test
         char buffer[512];
-#if 0
+
+#if 1
         nk_style_set_font(&app->gui->ctx, &app->gui->fonts[0]->handle);
-        if(nk_begin(&app->gui->ctx,"Test", nk_rect(100,100, 350,550), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_DYNAMIC | NK_WINDOW_SCALABLE))
+        if(nk_begin(&app->gui->ctx,"Test", nk_rect(100,100, 250,550), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_DYNAMIC | NK_WINDOW_SCALABLE))
         {
-            nk_layout_row_dynamic(&app->gui->ctx, 20, 1);
+            nk_layout_row_dynamic(&app->gui->ctx, 100, 1);
+            char buffer[512];
             sprintf(buffer, "Frame time: %lf ms", frame_time);
             nk_label(&app->gui->ctx, buffer, NK_TEXT_LEFT);
 
             nk_end(&app->gui->ctx);
         }
-#endif
+#else
         dm_log(DM_LOG_WARN, "%lf", frame_time);
+#endif
 
         dm_resource_handle resources[] = { app->cb,app->instance_buffer };
 

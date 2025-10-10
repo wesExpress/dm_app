@@ -6,7 +6,7 @@ PROJECT(app)
 ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-SET(SOURCES app.c gui.c DarkMatter/dm_impl.c DarkMatter/dm_window.c)
+SET(SOURCES app.c gui.c DarkMatter/dm_impl.c DarkMatter/dm_window.c )
 
 if(APPLE)
     SET(SOURCES ${SOURCES} DarkMatter/dm_metal.m)
@@ -16,14 +16,14 @@ endif()
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES})
 
-TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC . lib/ DarkMatter/lib/)
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC . lib/ lib/cimgui/ lib/cimgui/imgui/ DarkMatter/lib/)
 
 if(VULKAN)
     FIND_PACKAGE(Vulkan REQUIRED)
     TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
     TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC ${Vulkan_LIBRARIES})
 
-    ADD_SUBDIRECTORY(lib/VulkanMemoryAllocator)
+    ADD_SUBDIRECTORY(DarkMatter/lib/VulkanMemoryAllocator)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC VulkanMemoryAllocator)
 else()
     if(WIN32)
