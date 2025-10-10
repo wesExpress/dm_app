@@ -149,7 +149,6 @@ bool create_resources(application* app)
 
     dm_create_scissor(scissor, &app->scissor, app->context);
 
-
     dm_vertex_buffer_desc vb_desc = {
         .size=sizeof(vertices), .stride=sizeof(vertex),
         .data=vertices
