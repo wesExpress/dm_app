@@ -228,7 +228,6 @@ bool create_resources(application* app)
 exit_code app_run(application* app)
 {
     dm_timer timer = { 0 };
-    uint32_t frame_count = 0;
     double frame_time = 0;
 
     dm_timer_start(&timer);
@@ -279,54 +278,49 @@ exit_code app_run(application* app)
         }
 
         // gui test
+        char buffer[512];
+#if 0
         nk_style_set_font(&app->gui->ctx, &app->gui->fonts[0]->handle);
         if(nk_begin(&app->gui->ctx,"Test", nk_rect(100,100, 350,550), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_DYNAMIC | NK_WINDOW_SCALABLE))
         {
             nk_layout_row_dynamic(&app->gui->ctx, 20, 1);
-            char buffer[512];
             sprintf(buffer, "Frame time: %lf ms", frame_time);
             nk_label(&app->gui->ctx, buffer, NK_TEXT_LEFT);
 
             nk_end(&app->gui->ctx);
         }
+#endif
+        dm_log(DM_LOG_WARN, "%lf", frame_time);
 
         dm_resource_handle resources[] = { app->cb,app->instance_buffer };
 
         // rendering
         dm_render_command_begin_frame(app->context);
 
-        dm_render_command_begin_update(app->context);
-            dm_render_command_update_constant_buffer(app->cb, app->camera.vp, sizeof(mat4), 0, app->context);
-            dm_render_command_update_storage_buffer(app->instance_buffer, app->instances, sizeof(app->instances), 0, app->context);
+            dm_render_command_begin_update(app->context);
+                dm_render_command_update_constant_buffer(app->cb, app->camera.vp, sizeof(mat4), 0, app->context);
+                dm_render_command_update_storage_buffer(app->instance_buffer, app->instances, sizeof(app->instances), 0, app->context);
 
-            gui_update_buffers(app->gui, app->context);
-        dm_render_command_end_update(app->context);
+                //gui_update_buffers(app->gui, app->context);
+            dm_render_command_end_update(app->context);
 
-        dm_render_command_begin_render_pass(app->pass, 0.5f,0.7f,0.9f,1,1, app->context);
-            dm_render_command_set_viewport(app->viewport, app->context);
-            dm_render_command_set_scissor(app->scissor, app->context);
+            dm_render_command_begin_render_pass(app->pass, 0.5f,0.7f,0.9f,1,1, app->context);
+                dm_render_command_set_viewport(app->viewport, app->context);
+                dm_render_command_set_scissor(app->scissor, app->context);
 
-            dm_render_command_bind_raster_pipeline(app->pipeline, app->context);
-            dm_render_command_submit_resources(resources, DM_COUNTOF(resources), app->context);
-            dm_render_command_bind_vertex_buffer(app->vb, 0, 0, app->context);
-            dm_render_command_bind_index_buffer(app->ib, 0, app->context);
-            dm_render_command_draw_instanced_indexed(ENTITY_COUNT,0,6,0,0, app->context);
+                dm_render_command_bind_raster_pipeline(app->pipeline, app->context);
+                dm_render_command_submit_resources(resources, DM_COUNTOF(resources), app->context);
+                dm_render_command_bind_vertex_buffer(app->vb, 0, 0, app->context);
+                dm_render_command_bind_index_buffer(app->ib, 0, app->context);
+                dm_render_command_draw_instanced_indexed(ENTITY_COUNT,0,6,0,0, app->context);
 
-            gui_render(app->gui, app->context);
-        dm_render_command_end_render_pass(app->pass, app->context);
+                //gui_render(app->gui, app->context);
+            dm_render_command_end_render_pass(app->pass, app->context);
 
         dm_render_command_end_frame(app->context);
 
         if(!dm_submit_render_commands(app->context)) { dm_log(DM_LOG_FATAL, "submit commands failed"); return EXIT_CODE_RENDER_FAIL; }
         
-        // frame timing and fps
-        if(dm_timer_elapsed(&timer) >= 1)
-        {
-            dm_timer_start(&timer);
-            frame_count = 0;
-        }
-        else frame_count++;
-
         frame_time = dm_timer_elapsed_ms(&frame_timer);
     }
 
