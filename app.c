@@ -308,7 +308,7 @@ exit_code app_run(application* app)
                 dm_render_command_update_constant_buffer(app->cb, app->camera.vp, sizeof(mat4), 0, app->context);
                 dm_render_command_update_storage_buffer(app->instance_buffer, app->instances, sizeof(app->instances), 0, app->context);
 
-                //gui_update_buffers(app->gui, app->context);
+                gui_update_buffers(app->gui, app->context);
             dm_render_command_end_update(app->context);
 
             dm_render_command_begin_render_pass(app->pass, 0.5f,0.7f,0.9f,1,1, app->context);
@@ -321,7 +321,7 @@ exit_code app_run(application* app)
                 dm_render_command_bind_index_buffer(app->ib, 0, app->context);
                 dm_render_command_draw_instanced_indexed(ENTITY_COUNT,0,6,0,0, app->context);
 
-                //gui_render(app->gui, app->context);
+                gui_render(app->gui, app->context);
             dm_render_command_end_render_pass(app->pass, app->context);
 
         dm_render_command_end_frame(app->context);
