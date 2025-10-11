@@ -118,7 +118,7 @@ bool create_resources(application* app)
         .vertex_shader_desc.path="assets/shaders/vertex_shader.metallib",
         .pixel_shader_desc.path="assets/shaders/pixel_shader.metallib",
 #endif
-        .cull_mode=DM_RASTERIZER_CULL_MODE_NONE, .front_face=DM_RASTERIZER_FRONT_FACE_COUNTER_CLOCKWISE,
+        .cull_mode=DM_RASTERIZER_CULL_MODE_BACK, .front_face=DM_RASTERIZER_FRONT_FACE_COUNTER_CLOCKWISE,
         .polygon_fill=DM_RASTERIZER_POLYGON_FILL_FILL
     };
 
@@ -230,8 +230,8 @@ exit_code app_run(application* app)
 
         float move = 5.f * frame_time * 0.001f;
 
-        if(dm_input_is_key_pressed(DM_KEY_LEFT, app->context))       app->camera.position[0] += move; 
-        else if(dm_input_is_key_pressed(DM_KEY_RIGHT, app->context)) app->camera.position[0] -= move;
+        if(dm_input_is_key_pressed(DM_KEY_LEFT, app->context))       app->camera.position[0] -= move; 
+        else if(dm_input_is_key_pressed(DM_KEY_RIGHT, app->context)) app->camera.position[0] += move;
 
         if(dm_input_is_key_pressed(DM_KEY_UP, app->context))        app->camera.position[2] += move;
         else if(dm_input_is_key_pressed(DM_KEY_DOWN, app->context)) app->camera.position[2] -= move;
