@@ -221,12 +221,21 @@ exit_code app_run(application* app)
         dm_timer frame_timer = { 0 };
         dm_timer_start(&frame_timer);
 
+        float screen_width  = (float)dm_get_width(app->context);
+        float screen_height = (float)dm_get_height(app->context);
+
         if(!dm_update(app->context)) return EXIT_CODE_UPDATE_FAIL;
         gui_update_input(app->gui, app->context);
 
-        if(dm_input_is_key_pressed(DM_KEY_ESCAPE, app->context)) { dm_log(DM_LOG_WARN, "window closed"); return EXIT_CODE_WINDOW_CLOSE; }
+        if(dm_input_key_just_pressed(DM_KEY_ESCAPE, app->context)) { dm_log(DM_LOG_WARN, "window closed"); return EXIT_CODE_WINDOW_CLOSE; }
+
+        if(dm_input_key_just_pressed(DM_KEY_SPACE, app->context)) 
+        {
+            if(app->context->flags & DM_CONTEXT_FLAG_VSYNC_ON) app->context->flags &= ~DM_CONTEXT_FLAG_VSYNC_ON;
+            else                                               app->context->flags |= DM_CONTEXT_FLAG_VSYNC_ON;
+        }
         
-        glm_perspective(DM_DEG_TO_RAD(85.f), (float)dm_get_window_width(app->context) / (float)dm_get_window_height(app->context), 0.1f, 100.f, app->camera.perspective);
+        glm_perspective(DM_DEG_TO_RAD(85.f), screen_width / screen_height, 0.1f, 100.f, app->camera.perspective);
 
         float move = 5.f * frame_time * 0.001f;
 
@@ -257,10 +266,10 @@ exit_code app_run(application* app)
             glm_mat4_transpose(app->instances[i].model);
 #endif
 
-            if(i % 2) app->instances[i].indices[0] = dm_get_resource_index(app->texture2, app->context);
-            else      app->instances[i].indices[0] = dm_get_resource_index(app->texture, app->context);
+            app->instances[i].indices[0] = dm_get_resource_index(app->texture, app->context);
+            app->instances[i].indices[1] = dm_get_resource_index(app->texture2, app->context);
 
-            app->instances[i].indices[1] = dm_get_resource_index(app->sampler, app->context);
+            app->instances[i].indices[2] = dm_get_resource_index(app->sampler, app->context);
         }
 
         // gui test
@@ -270,8 +279,14 @@ exit_code app_run(application* app)
         nk_style_set_font(&app->gui->ctx, &app->gui->fonts[0]->handle);
         if(nk_begin(&app->gui->ctx,"Test", nk_rect(100,100, 250,550), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_DYNAMIC | NK_WINDOW_SCALABLE))
         {
-            nk_layout_row_dynamic(&app->gui->ctx, 100, 1);
             char buffer[512];
+
+            nk_layout_row_dynamic(&app->gui->ctx, 20, 1);
+            if(app->context->flags & DM_CONTEXT_FLAG_VSYNC_ON) sprintf(buffer, "Vsync: on");
+            else                                               sprintf(buffer, "Vsync: off");
+            nk_label(&app->gui->ctx, buffer, NK_TEXT_LEFT);
+
+            nk_layout_row_dynamic(&app->gui->ctx, 20, 1);
             sprintf(buffer, "Frame time: %lf ms", frame_time);
             nk_label(&app->gui->ctx, buffer, NK_TEXT_LEFT);
 

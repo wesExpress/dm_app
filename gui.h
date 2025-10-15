@@ -10,10 +10,9 @@
 
 #include "DarkMatter/dm.h"
 
-#define MAX_NUKLEAR_VERTEX_BUFFER 512 * 1024
-#define MAX_NUKLEAR_INDEX_BUFFER  128 * 1024
+#define MAX_NUKLEAR_VERTEX_BUFFER 5000 
+#define MAX_NUKLEAR_INDEX_BUFFER  5000 
 
-#define MAX_NUKLEAR_VERTICES 1000
 typedef struct nuklear_vertex_t
 {
     vec2 position;

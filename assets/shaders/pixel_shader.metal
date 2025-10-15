@@ -36,9 +36,13 @@ fragment float4 fragment_main(const device texture_argument_buffer& t_buffer[[bu
 {
     instance inst = resources.instances[frag.inst_id];
 
-    texture2d<float> t = t_buffer.textures[inst.indices[0]];
-    sampler s = t_buffer.samplers[inst.indices[1]];
+    texture2d<float> t1 = t_buffer.textures[inst.indices[0]];
+    texture2d<float> t2 = t_buffer.textures[inst.indices[1]];
+    sampler s = t_buffer.samplers[inst.indices[2]];
 
-    return t.sample(s, frag.uv);
+    float4 color1 = t1.sample(s, frag.uv);
+    float4 color2 = t2.sample(s, frag.uv);
+
+    return mix(color1, color2, 0.2f) * frag.color;
 }
 
